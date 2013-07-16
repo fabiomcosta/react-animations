@@ -29,8 +29,9 @@ var Spinner = React.createClass({
 // API, so we'll need a heuristic. For now, that heuristic is "wait 2 seconds".
 // Additionally, we only use progressive loading on Retina iPads for now.
 var DECODE_TIME = 2000;
-var SHOULD_USE_PROGRESSIVE =
-  document.documentElement.documentWidth * document.documentElement.documentHeight >= 1024 * 672;
+//var SHOULD_USE_PROGRESSIVE =
+//  document.documentElement.documentWidth * document.documentElement.documentHeight >= 1024 * 672;
+var SHOULD_USE_PROGRESSIVE = true;
 
 var ProgressiveImg = React.createClass({
   getInitialState: function() {
