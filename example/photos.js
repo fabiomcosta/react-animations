@@ -43,6 +43,7 @@ var Img = React.createClass({
   },
   componentWillMount: function() {
     this.timeout = null;
+    this.loadingHD = false;
     this.img = new Image();
     this.img.onload = this.handleLoaded;
     this.img.src = this.props.src;
@@ -68,6 +69,10 @@ var Img = React.createClass({
     }
   },
   loadHD: function() {
+    if (this.loadingHD) {
+      return;
+    }
+    this.loadingHD = true;
     this.img = new Image();
     this.img.onload = this.handleHDLoaded;
     this.img.src = this.props.hdsrc;
