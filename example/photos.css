@@ -21,6 +21,23 @@ body {
   position: relative;
 }
 
+.Img .ImgHD {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  opacity: 0.1;
+}
+
+.Img.ImgHDDecoded .ImgHD {
+  opacity: 1.0;
+}
+
+.Img.ImgHDDecoded {
+  background: none;
+}
+
 .Img .Spinner {
   position: absolute;
   top: 50%;

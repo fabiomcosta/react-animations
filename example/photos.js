@@ -25,9 +25,12 @@ var Spinner = React.createClass({
   }
 });
 
+// give the gpu 2 seconds to decode.
+var DECODE = 2000;
+
 var Img = React.createClass({
   getInitialState: function() {
-    return {loaded: false};
+    return {loaded: false, hdLoaded: false, hdDecoded: false};
   },
   handleLoaded: function() {
     if (!this.isMounted()) {
@@ -35,17 +38,75 @@ var Img = React.createClass({
     }
     // TODO: it's possible that this will execute during an animation and skip a frame.
     this.setState({loaded: true});
+
+    this.loadHD();
   },
   componentWillMount: function() {
+    this.timeout = null;
     this.img = new Image();
     this.img.onload = this.handleLoaded;
     this.img.src = this.props.src;
   },
+  handleHDLoaded: function() {
+    if (!this.isMounted()) {
+      return;
+    }
+    // TODO: it's possible that this will execute during an animation and skip a frame.
+    this.setState({hdLoaded: true});
+    this.timeout = setTimeout(this.handleHDDecoded, DECODE_TIME);
+  },
+  handleHDDecoded: function() {
+    if (!this.isMounted()) {
+      return;
+    }
+    this.setState({hdDecoded: true});
+    this.timeout = null;
+  },
+  componentWillUnmount: function() {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
+  },
+  loadHD: function() {
+    this.img = new Image();
+    this.img.onload = this.handleHDLoaded;
+    this.img.src = this.props.hdsrc;
+  },
+  handleLoaded: function() {
+    if (!this.isMounted()) {
+      return;
+    }
+    // TODO: it's possible that this will execute during an animation and skip a frame.
+    this.setState({loaded: true});
+
+    this.loadHD();
+  },
   render: function() {
     if (!this.state.loaded) {
-      return <div class="Img" style={{width: this.props.width, height: this.props.height}}><Spinner /></div>;
+      return (
+        <div
+            class="Img"
+            style={{
+              width: this.props.width,
+              height: this.props.height}}>
+          <Spinner />
+        </div>
+      );
     }
-    return <div class="Img" style={{width: this.props.width, height: this.props.height, background: 'url(' + this.props.src + ')'}} />;
+    var hd = null;
+    if (this.props.hdsrc) {
+      hd = <div class="ImgHD" style={{background: 'url(' + this.props.hdsrc + ')'}} />;
+    }
+    return (
+      <div
+          class={'Img ' + (this.state.hdDecoded ? 'ImgHDDecoded' : '')}
+          style={{
+            width: this.props.width,
+            height: this.props.height,
+            background: 'url(' + this.props.src + ')'}}>
+        {hd}
+      </div>
+    );
   }
 });
 
