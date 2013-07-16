@@ -26,9 +26,12 @@ var Spinner = React.createClass({
 });
 
 // give the chip 2 seconds to decode.
+// TODO: heuristics for these two variables (i.e. progressive only on ipad,
+// decode time based on how many pixels the image is?)
 var DECODE_TIME = 2000;
+var SHOULD_USE_PROGRESSIVE = true;
 
-var Img = React.createClass({
+var ProgressiveImg = React.createClass({
   getInitialState: function() {
     return {loaded: false, hdLoaded: false, hdDecoded: false};
   },
@@ -36,22 +39,37 @@ var Img = React.createClass({
     if (!this.isMounted()) {
       return;
     }
+
+    // cleanup old Image instance
+    this.img = null;
+
     // TODO: it's possible that this will execute during an animation and skip a frame.
     this.setState({loaded: true});
 
     this.loadHD();
+  },
+  getBaseSrc: function() {
+    if (SHOULD_USE_PROGRESSIVE || !this.props.hdsrc) {
+      return this.props.src;
+    } else {
+      return this.props.hdsrc;
+    }
   },
   componentWillMount: function() {
     this.timeout = null;
     this.loadingHD = false;
     this.img = new Image();
     this.img.onload = this.handleLoaded;
-    this.img.src = this.props.src;
+    this.img.src = this.getBaseSrc();
   },
   handleHDLoaded: function() {
     if (!this.isMounted()) {
       return;
     }
+
+    // cleanup old img instance
+    this.img = null;
+
     // TODO: it's possible that this will execute during an animation and skip a frame.
     this.setState({hdLoaded: true});
     this.timeout = setTimeout(this.handleHDDecoded, DECODE_TIME);
@@ -69,23 +87,13 @@ var Img = React.createClass({
     }
   },
   loadHD: function() {
-    if (this.loadingHD || !this.props.hdsrc) {
+    if (this.loadingHD || !this.props.hdsrc && SHOULD_USE_PROGRESSIVE) {
       return;
     }
     this.loadingHD = true;
     this.img = new Image();
     this.img.onload = this.handleHDLoaded;
     this.img.src = this.props.hdsrc;
-  },
-  handleLoaded: function() {
-    if (!this.isMounted()) {
-      return;
-    }
-    // TODO: it's possible that this will execute during an animation and skip a frame.
-    this.setState({loaded: true});
-
-    // TODO: always load HD?
-    this.loadHD();
   },
   render: function() {
     if (!this.state.loaded) {
@@ -103,15 +111,22 @@ var Img = React.createClass({
     if (this.props.hdsrc) {
       hd = <div class="ImgHD" style={{background: 'url(' + this.props.hdsrc + ')'}} />;
     }
+
+    var style = {
+      width: this.props.width,
+      height: this.props.height,
+      background: 'url(' + this.getBaseSrc() + ')'
+    };
+
+    if (SHOULD_USE_PROGRESSIVE) {
+      style.backgroundPosition = '0 0';
+      style.backgroundSize = '100% 100%';
+    }
+
     return (
       <div
           class={'Img ' + (this.state.hdDecoded ? 'ImgHDDecoded' : '')}
-          style={{
-            width: this.props.width,
-            height: this.props.height,
-            background: 'url(' + this.props.src + ')',
-            backgroundPosition: '0 0',
-            backgroundSize: '100% 100%'}}>
+          style={style}>
         {hd}
       </div>
     );
@@ -132,7 +147,12 @@ var Photo = React.createClass({
   render: function() {
     return (
       <PhotoContainer width={this.props.width} height={this.props.height}>
-        <Img hdsrc={this.props.hdsrc} src={this.props.src} width="100%" height="100%" />
+        <ProgressiveImg
+          hdsrc={this.props.hdsrc}
+          src={this.props.src}
+          width="100%"
+          height="100%"
+        />
         <div class="PhotoInfo">
           <div class="PhotoText">
             <div class="PhotoCaption">{this.props.caption}</div>
