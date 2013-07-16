@@ -108,7 +108,9 @@ var Img = React.createClass({
           style={{
             width: this.props.width,
             height: this.props.height,
-            background: 'url(' + this.props.src + ')'}}>
+            background: 'url(' + this.props.src + ')',
+            backgroundPosition: '0 0',
+            backgroundSize: '100% 100%'}}>
         {hd}
       </div>
     );
