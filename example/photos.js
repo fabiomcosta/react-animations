@@ -25,11 +25,12 @@ var Spinner = React.createClass({
   }
 });
 
-// give the chip 2 seconds to decode.
-// TODO: heuristics for these two variables (i.e. progressive only on ipad,
-// decode time based on how many pixels the image is?)
+// It's impossible to detect how long it will take to decode a jpeg since there is no
+// API, so we'll need a heuristic. For now, that heuristic is "wait 2 seconds".
+// Additionally, we only use progressive loading on Retina iPads for now.
 var DECODE_TIME = 2000;
-var SHOULD_USE_PROGRESSIVE = true;
+var SHOULD_USE_PROGRESSIVE =
+  document.documentElement.documentWidth * document.documentElement.documentHeight >= 1024 * 672;
 
 var ProgressiveImg = React.createClass({
   getInitialState: function() {
