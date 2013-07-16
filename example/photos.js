@@ -25,8 +25,8 @@ var Spinner = React.createClass({
   }
 });
 
-// give the gpu 2 seconds to decode.
-var DECODE = 2000;
+// give the chip 2 seconds to decode.
+var DECODE_TIME = 2000;
 
 var Img = React.createClass({
   getInitialState: function() {
@@ -69,7 +69,7 @@ var Img = React.createClass({
     }
   },
   loadHD: function() {
-    if (this.loadingHD) {
+    if (this.loadingHD || !this.props.hdsrc) {
       return;
     }
     this.loadingHD = true;
@@ -84,6 +84,7 @@ var Img = React.createClass({
     // TODO: it's possible that this will execute during an animation and skip a frame.
     this.setState({loaded: true});
 
+    // TODO: always load HD?
     this.loadHD();
   },
   render: function() {
@@ -131,7 +132,7 @@ var Photo = React.createClass({
   render: function() {
     return (
       <PhotoContainer width={this.props.width} height={this.props.height}>
-        <Img src={this.props.src} width="100%" height="100%" />
+        <Img hdsrc={this.props.hdsrc} src={this.props.src} width="100%" height="100%" />
         <div class="PhotoInfo">
           <div class="PhotoText">
             <div class="PhotoCaption">{this.props.caption}</div>
@@ -263,7 +264,8 @@ for (var i = 0; i < NUM_PHOTOS; i++) {
     <Photo
       width={SAMPLE_WIDTH}
       height={SAMPLE_HEIGHT}
-      src={'http://lorempixel.com/' + SAMPLE_WIDTH + '/' + SAMPLE_HEIGHT + '/nature/' + (i + 1) + '/'}
+      hdsrc={'http://lorempixel.com/' + SAMPLE_WIDTH + '/' + SAMPLE_HEIGHT + '/nature/' + (i + 1) + '/'}
+      src={'http://lorempixel.com/' + Math.floor(SAMPLE_WIDTH / 4) + '/' + Math.floor(SAMPLE_HEIGHT / 4) + '/nature/' + (i + 1) + '/'}
       caption={'Lorempixel placeholder image ' + (i + 1)}
       domain={'lorempixel.com'}
     />
