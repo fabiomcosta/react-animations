@@ -63,7 +63,7 @@ var Photo = React.createClass({
   render: function() {
     return (
       <PhotoContainer width={this.props.width} height={this.props.height}>
-        <Img src={this.props.src} width="100%" height="100%" />
+        <MagicImg src={this.props.src} width="100%" height="100%" />
         <div class="PhotoInfo">
           <div class="PhotoText">
             <div class="PhotoCaption">{this.props.caption}</div>
